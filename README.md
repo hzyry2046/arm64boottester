@@ -1,1 +1,4 @@
-"# arm64boottester" 
+以@alive的qemu启动测试器为灵感，制作了模拟arm64的启动测试器。
+目前磁盘镜像和光盘镜像没有问题，但是linux启动暂时不行。
+默认使用usb磁盘接口，virt主板，cortex-a53(?) cpu,默认开启tcg加速，默认4核（忘删-smp 4了）
+这是屑作，非常垃圾。
