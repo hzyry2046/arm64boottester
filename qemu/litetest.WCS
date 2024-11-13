@@ -1,0 +1,57 @@
+﻿_SUB WIN1,W381H310,armtest,,,,,
+    EDIT disk,L38T63W286H30,,,0x100
+    LABE LABE1,L2T64W34H30,启动文件,,
+    LABE labe2,L64T111W60H30,内存,,
+    EDIT ram,L162T109W60H30,512,,
+    ITEM ITEM1,L130T188W99H54,启动模拟,call emu,
+    RADI hd,L2T148W88H30,磁盘镜像,envi media=disk,,
+    RADI cd,L98T148W82H30,光盘镜像,envi media=cdrom,,
+    ITEM ITEM2,L326T64W49H30,选择,call filechoose,
+    LABE LABE3,L-3T241W376H30,注意：linux的附加磁盘需要在主界面选择，但是要在linux选项里启动。linux启动为实验性功能，不包能用,,
+    ITEM ITEM3,L207T148W112H30,模拟linux相关,call linuxcon,
+    ITEM ITEM4,L263T191W60H30,关于,call about
+_END
+_sub emu
+    call init
+    exec %curdir%\qemu-system-aarch64.exe %usb% %drive% %opt%
+_end
+_sub emuLINUX
+    call init
+    exec %curdir%\qemu-system-aarch64.exe %usb% %drive% %opt% -kernel %kernel% -initrd %initrd% -append "%append%"
+_end
+
+_sub init
+    envi opt=-M virt,virtualization=true,kernel-irqchip=off,mem-merge=off,hmat=off -mem-prealloc -nodefaults -no-user-config -nodefaults -msg timestamp=off -cpu cortex-a53 -smp 4 -m %ram% -accel tcg,thread=multi -nic user,model=virtio -bios arm.fd -device ramfb
+    envi usb=-device nec-usb-xhci -device usb-kbd -device usb-tablet
+    envi drive=-drive file=%disk%,media=%media%,if=none,id=drive -device usb-storage,drive=drive
+_end
+_sub filechoose
+    BROW image,,请选择启动文件,
+    envi @disk=%image%
+_end
+_sub kernelchoose
+    BROW kernelb,,请选择linux内核文件,
+    envi @kernel=%kernelb%
+_end
+_sub initrdchoose
+    BROW initrdb,,请选择linux初始内存盘文件,
+    envi @initrd=%initrdb%
+_end
+_sub linuxcon,W380H194,linux启动设置,
+    EDIT kernel,L64T3W263H30,选择或拖入文件,,0x100
+    EDIT initrd,L62T40W263H30,选择或拖入文件,,0x100
+    EDIT append,L65T75W307H30,,,
+    LABE LABE1,L11T4W51H30,kernel,,
+    LABE LABE2,L9T39W51H30,initrd,,
+    LABE LABE3,L0T75W64H30,内核命令行参数,,
+    ITEM lkerch,L327T2W47H30,选择,call kernelchoose,
+    ITEM linich,L326T41W47H30,选择,call initrdchoose,
+    ITEM ITEM1,L153T112W83H48,启动linux,CALL emulinux
+_end
+_SUB about,W380H310,关于,
+    LABE LABE1,L47T130W271H19,灵感来自于阿弥陀佛的qemu启动测试器,,
+    LABE LABE2,L88T22W165H21,ARM64 QEMU 启动测试器,,
+    LABE LABE3,L101T83W144H17,作者：hzyry2046,,
+_END
+
+call win1
